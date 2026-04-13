@@ -1,0 +1,198 @@
+<UserControl x:Class="USDT_Sender.Controls.UniversalLoader"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d"
+    Visibility="Collapsed">
+
+    <UserControl.Resources>
+
+        <!-- ── Spin animation on the arc ── -->
+        <Storyboard x:Key="SpinAnim" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="SpinRotate"
+                Storyboard.TargetProperty="Angle"
+                From="0" To="360"
+                Duration="0:0:1.1" />
+        </Storyboard>
+
+        <!-- ── Pulse animation on the centre dot ── -->
+        <Storyboard x:Key="PulseAnim" RepeatBehavior="Forever"
+            AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="CentreDot"
+                Storyboard.TargetProperty="Opacity"
+                From="0.3" To="1.0"
+                Duration="0:0:0.8" />
+        </Storyboard>
+
+        <!-- ── Progress bar fill animation ── -->
+        <Storyboard x:Key="ProgressAnim" x:Name="ProgressAnim">
+            <DoubleAnimation Storyboard.TargetName="ProgressFill"
+                Storyboard.TargetProperty="Width"
+                From="0" To="200"
+                Duration="0:0:3" />
+        </Storyboard>
+
+        <!-- ── Fade-in on show ── -->
+        <Storyboard x:Key="FadeIn">
+            <DoubleAnimation Storyboard.TargetName="DialogCard"
+                Storyboard.TargetProperty="Opacity"
+                From="0" To="1"
+                Duration="0:0:0.25" />
+            <DoubleAnimation Storyboard.TargetName="DialogCard"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                From="0.92" To="1"
+                Duration="0:0:0.25" />
+            <DoubleAnimation Storyboard.TargetName="DialogCard"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                From="0.92" To="1"
+                Duration="0:0:0.25" />
+        </Storyboard>
+
+        <!-- ── Fade-out on hide ── -->
+        <Storyboard x:Key="FadeOut" Completed="FadeOut_Completed">
+            <DoubleAnimation Storyboard.TargetName="DialogCard"
+                Storyboard.TargetProperty="Opacity"
+                From="1" To="0"
+                Duration="0:0:0.2" />
+        </Storyboard>
+
+    </UserControl.Resources>
+
+    <!-- Fullscreen dimmed overlay -->
+    <Grid Background="#CC0D0D10">
+
+        <!-- Loader card -->
+        <Border x:Name="DialogCard"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Width="340"
+            Background="#FF18181F"
+            BorderBrush="#FF252535"
+            BorderThickness="1"
+            CornerRadius="20"
+            Padding="40,36"
+            Opacity="0">
+
+            <Border.RenderTransform>
+                <ScaleTransform ScaleX="1" ScaleY="1"
+                    CenterX="170" CenterY="130" />
+            </Border.RenderTransform>
+
+            <StackPanel HorizontalAlignment="Center">
+
+                <!-- ── Spinner ring ── -->
+                <Grid Width="80" Height="80"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,28">
+
+                    <!-- Track ring -->
+                    <Ellipse Width="80" Height="80"
+                        Stroke="#FF252535" StrokeThickness="5" />
+
+                    <!-- Spinning arc -->
+                    <Canvas Width="80" Height="80">
+                        <Canvas.RenderTransform>
+                            <RotateTransform x:Name="SpinRotate"
+                                Angle="0" CenterX="40" CenterY="40" />
+                        </Canvas.RenderTransform>
+                        <Path Stroke="#FF7B6EF6" StrokeThickness="5"
+                            StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                            <Path.Data>
+                                <!-- Arc: roughly 270° of a 37.5r circle centred at 40,40 -->
+                                <PathGeometry>
+                                    <PathFigure StartPoint="40,2.5" IsClosed="False">
+                                        <ArcSegment Point="2.5,40"
+                                            Size="37.5,37.5"
+                                            SweepDirection="Clockwise"
+                                            IsLargeArc="True" />
+                                    </PathFigure>
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+
+                    <!-- Pulsing centre dot -->
+                    <Ellipse x:Name="CentreDot"
+                        Width="12" Height="12"
+                        Fill="#FF7B6EF6"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="1" />
+                </Grid>
+
+                <!-- ── Message ── -->
+                <TextBlock x:Name="TxtLoaderMessage"
+                    Text="Please wait…"
+                    FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold"
+                    Foreground="#FFF4F4F8"
+                    HorizontalAlignment="Center"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap"
+                    MaxWidth="260"
+                    Margin="0,0,0,6" />
+
+                <!-- ── Sub-message ── -->
+                <TextBlock x:Name="TxtLoaderSub"
+                    Text="This won't take long."
+                    FontFamily="Segoe UI" FontSize="11"
+                    Foreground="#FF6B6B88"
+                    HorizontalAlignment="Center"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap"
+                    MaxWidth="260"
+                    Margin="0,0,0,24" />
+
+                <!-- ── Progress bar (only visible when Duration > 0) ── -->
+                <Border x:Name="ProgressContainer"
+                    Width="200" Height="4"
+                    Background="#FF252535"
+                    CornerRadius="2"
+                    HorizontalAlignment="Center"
+                    Visibility="Collapsed">
+                    <Border HorizontalAlignment="Left" Height="4" CornerRadius="2"
+                        Background="#FF7B6EF6">
+                        <Border.Width>
+                            <Binding ElementName="ProgressFill" Path="Width" />
+                        </Border.Width>
+                    </Border>
+                </Border>
+
+                <!-- Invisible element that drives the progress width -->
+                <Rectangle x:Name="ProgressFill" Width="0" Height="0" />
+
+                <!-- ── Elapsed label ── -->
+                <TextBlock x:Name="TxtElapsed"
+                    Text=""
+                    FontFamily="Consolas" FontSize="10"
+                    Foreground="#FF6B6B88"
+                    HorizontalAlignment="Center"
+                    Margin="0,8,0,0"
+                    Visibility="Collapsed" />
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
+
+
+<!-- 
+What's in it:
+
+Spinner: A 270° arc on a track ring, rotating at 1.1s per cycle
+
+Centre dot: Pulses opacity 0.3 → 1.0 in sync, adds depth
+
+Fade + scale in: Card scales from 92% → 100% on appear
+
+Fade out: Smooth fade before Collapsed — no hard snap
+
+Progress bar: Only renders when duration > 0, animates across the full duration
+
+Elapsed counter: Ticks every second so the user always knows time is passing
+
+UpdateMessage(): Lets you narrate multi-step operations live without hiding/reshowing
+
+Auto-dismiss: DispatcherTimer fires Hide() exactly when the progress bar completes
+
+-->
