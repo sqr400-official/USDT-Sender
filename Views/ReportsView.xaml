@@ -282,6 +282,133 @@
         </Setter.Value>
       </Setter>
     </Style>
+
+
+    <Style x:Key="FieldCombo" TargetType="ComboBox">
+      <Setter Property="Background" Value="{StaticResource BgCard }" />
+      <Setter Property="Foreground" Value="{StaticResource TxtPrimary}" />
+      <Setter Property="BorderBrush" Value="{StaticResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontFamily" Value="Segoe UI" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Height" Value="48" />
+      <Setter Property="Padding" Value="16,0" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="Effect" Value="{StaticResource InputGlow}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBox">
+            <Grid>
+              <Border x:Name="Bd"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="12">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="36" />
+                  </Grid.ColumnDefinitions>
+                  <ContentPresenter x:Name="ContentSite"
+                    Grid.Column="0"
+                    Content="{TemplateBinding SelectionBoxItem}"
+                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                    Margin="{TemplateBinding Padding}"
+                    VerticalAlignment="Center"
+                    IsHitTestVisible="False" />
+                  <TextBlock Grid.Column="1"
+                    Text="⌄"
+                    FontSize="14"
+                    Foreground="{StaticResource TxtMuted}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+                  <ToggleButton Grid.ColumnSpan="2"
+                    IsChecked="{Binding IsDropDownOpen,
+                                              RelativeSource={RelativeSource TemplatedParent},
+                                              Mode=TwoWay}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Focusable="False" />
+                </Grid>
+              </Border>
+              <Popup x:Name="PART_Popup"
+                IsOpen="{TemplateBinding IsDropDownOpen}"
+                AllowsTransparency="True"
+                Focusable="False"
+                PopupAnimation="Fade"
+                Placement="Bottom">
+                <Border x:Name="DropBorder"
+                  MinWidth="{TemplateBinding ActualWidth}"
+                  MaxHeight="240"
+                  Background="#FF1E1E28"
+                  BorderBrush="{StaticResource Border}"
+                  BorderThickness="1"
+                  CornerRadius="12"
+                  Margin="0,4,0,0"
+                  Effect="{StaticResource CardShadow}">
+                  <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsPresenter />
+                  </ScrollViewer>
+                </Border>
+              </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="BorderBrush"
+                  Value="{StaticResource Accent}" />
+              </Trigger>
+              <Trigger Property="IsDropDownOpen" Value="True">
+                <Setter TargetName="Bd" Property="BorderBrush"
+                  Value="{StaticResource Accent}" />
+                <Setter TargetName="Bd" Property="Background"
+                  Value="{StaticResource BgInputHover}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="ItemContainerStyle">
+        <Setter.Value>
+          <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource TxtPrimary}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                  <Border x:Name="ItemBd"
+                    Background="{TemplateBinding Background}"
+                    Padding="{TemplateBinding Padding}"
+                    CornerRadius="8"
+                    Margin="6,3">
+                    <ContentPresenter VerticalAlignment="Center" />
+                  </Border>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                      <Setter TargetName="ItemBd" Property="Background"
+                        Value="#FF252535" />
+                      <Setter Property="Foreground"
+                        Value="{StaticResource TxtPrimary}" />
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="ItemBd" Property="Background"
+                        Value="#1A7B6EF6" />
+                      <Setter Property="Foreground"
+                        Value="{StaticResource AccentSoft}" />
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+
   </UserControl.Resources>
 
   <!-- 🎨 MAIN LAYOUT -->
@@ -397,8 +524,12 @@
                 Width="280" Margin="0,0,16,0"
                 TextChanged="TxtSearch_TextChanged" />
 
+
               <!-- Status Filter -->
-              <ComboBox x:Name="CmbStatusFilter" Width="140" Height="48"
+              <ComboBox
+                x:Name="CmbStatusFilter"
+                Style="{StaticResource FieldCombo}"
+                Width="140" Height="48"
                 Background="{StaticResource BgInput}" Foreground="{StaticResource TxtPrimary}"
                 BorderBrush="{StaticResource Border}" BorderThickness="1"
                 FontFamily="Segoe UI" FontSize="13" Padding="14,0"

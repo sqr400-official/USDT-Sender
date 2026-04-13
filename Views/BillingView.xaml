@@ -488,7 +488,9 @@
                             <StackPanel Margin="0,0,0,20">
                                 <TextBlock Text="SELECT CRYPTOCURRENCY"
                                     Style="{StaticResource FieldLabel}" />
-                                <ComboBox x:Name="CmbCrypto" Style="{StaticResource FieldCombo}"
+                                <ComboBox
+                                    x:Name="CmbCrypto"
+                                    Style="{StaticResource FieldCombo}"
                                     SelectedIndex="3">
                                     <ComboBoxItem Content="₿  Bitcoin (BTC)" />
                                     <ComboBoxItem Content="Ξ  Ethereum (ETH)" />
