@@ -293,13 +293,13 @@ namespace USDT_Sender.Views
             // ── Persist to local storage ───────────────────────────────────
             var newTransaction = new TransactionRecord
             {
-                Date          = DateTime.Now,
-                Type          = "Send",
-                Amount        = _amountDue,
-                Crypto        = cryptoLabel,
-                Status        = "Completed",
-                Txid          = txId,
-                WalletAddress = TxtWalletAddress.Text.Trim()
+                Date = DateTime.Now,
+                Type = "Send",
+                Amount = _amountDue,
+                Crypto = cryptoLabel,
+                Status = "Completed",
+                Txid = txId,
+                WalletAddress = TxtWalletAddress.Text.Trim(),
             };
 
             TransactionStorageService.AddTransaction(newTransaction);
@@ -307,12 +307,63 @@ namespace USDT_Sender.Views
             // ── Show success dialog ────────────────────────────────────────
             dialog?.Show(
                 "Payment Confirmed",
-                $"Payment of ${_amountDue:N2} confirmed.\n\n"
-                    + $"Transaction ID: {txId}",
+                $"Payment of ${_amountDue:N2} confirmed.\n\n" + $"Transaction ID: {txId}",
                 actionLabel: "View Receipt",
                 closeLabel: "Done",
                 type: DialogType.Success
             );
+
+            // Instead of dynamic, use the actual type
+            var dialogControl = dialog as USDT_Sender.Controls.CustomDialog;
+
+            if (dialogControl != null)
+            {
+                dialogControl.ActionClicked += (s, e) =>
+                {
+                    dialogControl.ActionClicked -= null;
+                    NavigateToReports();
+                };
+            }
+
+            // ── Clear form ──────────────────────────────────────────────
+            TxtAmountToSend.Text = "";
+            TxtWalletAddress.Text = "";
+            CmbCrypto.SelectedIndex = 0;
+            GenerateOtp();
+        }
+
+        private static void NavigateToReports()
+        {
+            if (Application.Current.MainWindow is MainWindow main)
+            {
+                main.NavigateTo("Reports");
+            }
+        }
+
+        public void SetAccessLevel(bool isActive)
+        {
+            // If you have a main Grid named "MainGrid" or similar in XAML,
+            // you can disable it entirely:
+            // this.IsEnabled = isActive;
+
+            // Or disable specific parts:
+            TxtAmountToSend.IsEnabled = isActive;
+            TxtWalletAddress.IsEnabled = isActive;
+            CmbCrypto.IsEnabled = isActive;
+
+            // Always keep the Proceed button disabled if not active
+            if (!isActive)
+            {
+                BtnProceed.IsEnabled = false;
+                BtnProceed.Content = "ACTIVATION REQUIRED";
+                BtnProceed.Background = new SolidColorBrush(Color.FromRgb(0x44, 0x44, 0x55)); // Muted gray
+            }
+            else
+            {
+                UpdateProceedButton(); // Restore normal validation logic
+                BtnProceed.Content = "PROCEED TO SEND";
+                BtnProceed.Background = (SolidColorBrush)FindResource("Accent");
+            }
         }
     }
 }

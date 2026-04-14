@@ -6,7 +6,13 @@ using System.Windows.Media;
 namespace USDT_Sender.Controls
 {
     // ── Dialog type controls the icon + accent colour ──
-    public enum DialogType { Info, Success, Warning, Danger }
+    public enum DialogType
+    {
+        Info,
+        Success,
+        Warning,
+        Danger,
+    }
 
     public partial class CustomDialog : UserControl
     {
@@ -17,10 +23,10 @@ namespace USDT_Sender.Controls
         // ── Brushes keyed to DialogType ───────────────────
         private static readonly (string Icon, string BadgeBg, string IconFg)[] TypeTheme =
         {
-            ("ℹ",  "#1A7B6EF6", "#FF7B6EF6"),   // Info
-            ("✓",  "#1A2DD4BF", "#FF2DD4BF"),   // Success
-            ("⚠",  "#1AFBBF24", "#FFFBBF24"),   // Warning
-            ("✕",  "#1AFF5C6E", "#FFFF5C6E"),   // Danger
+            ("ℹ", "#1A7B6EF6", "#FF7B6EF6"), // Info
+            ("✓", "#1A2DD4BF", "#FF2DD4BF"), // Success
+            ("⚠", "#1AFBBF24", "#FFFBBF24"), // Warning
+            ("✕", "#1AFF5C6E", "#FFFF5C6E"), // Danger
         };
 
         public CustomDialog()
@@ -36,16 +42,17 @@ namespace USDT_Sender.Controls
         /// Show the dialog with full configuration.
         /// </summary>
         public void Show(
-            string      header,
-            string      message,
-            string      actionLabel  = "Confirm",
-            string      closeLabel   = "Cancel",
-            DialogType  type         = DialogType.Info)
+            string header,
+            string message,
+            string actionLabel = "Confirm",
+            string closeLabel = "Cancel",
+            DialogType type = DialogType.Info
+        )
         {
-            TxtHeader.Text  = header;
+            TxtHeader.Text = header;
             TxtMessage.Text = message;
             BtnAction.Content = actionLabel;
-            BtnClose.Content  = closeLabel;
+            BtnClose.Content = closeLabel;
 
             ApplyType(type);
             Visibility = Visibility.Visible;
@@ -80,7 +87,7 @@ namespace USDT_Sender.Controls
         {
             var (icon, badgeBg, iconFg) = TypeTheme[(int)type];
 
-            TxtIcon.Text       = icon;
+            TxtIcon.Text = icon;
             TxtIcon.Foreground = BrushFrom(iconFg);
             IconBadge.Background = BrushFrom(badgeBg);
 
@@ -89,14 +96,13 @@ namespace USDT_Sender.Controls
             {
                 DialogType.Success => BrushFrom("#FF2DD4BF"),
                 DialogType.Warning => BrushFrom("#FFFBBF24"),
-                DialogType.Danger  => BrushFrom("#FFFF5C6E"),
-                _                  => BrushFrom("#FF7B6EF6"),
+                DialogType.Danger => BrushFrom("#FFFF5C6E"),
+                _ => BrushFrom("#FF7B6EF6"),
             };
 
             // Warning uses dark text for contrast
-            BtnAction.Foreground = type == DialogType.Warning
-                ? BrushFrom("#FF111118")
-                : Brushes.White;
+            BtnAction.Foreground =
+                type == DialogType.Warning ? BrushFrom("#FF111118") : Brushes.White;
         }
 
         private static SolidColorBrush BrushFrom(string hex)

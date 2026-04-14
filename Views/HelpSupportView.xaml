@@ -1,11 +1,14 @@
-<UserControl x:Class="USDT_Sender.Views.HelpSupportView"
+<UserControl
+  x:Class="USDT_Sender.Views.HelpSupportView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:controls="clr-namespace:USDT_Sender.Controls"
   mc:Ignorable="d"
-  d:DesignHeight="900" d:DesignWidth="1000">
-
+  d:DesignHeight="900"
+  d:DesignWidth="1000"
+>
   <UserControl.Resources>
     <!-- 🎨 PALETTE - Reused from BillingView for consistency -->
     <SolidColorBrush x:Key="BgPanel" Color="#FF13131A" />
@@ -486,7 +489,7 @@
                 TextWrapping="Wrap" LineHeight="20"> Yes. We use end-to-end encryption, never store
                 private keys, and comply with GDPR/CCPA. All sensitive operations require 2FA
                 verification. Learn more in our <Hyperlink
-                  NavigateUri="https://usdt-sender.com/privacy"
+                  NavigateUri="https://stealthvendor.com/privacy"
                   RequestNavigate="Hyperlink_RequestNavigate">Privacy Policy</Hyperlink>. </TextBlock>
             </Expander>
 
@@ -514,7 +517,7 @@
             <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
               <TextBlock Text="🌐 Visit Our Website" FontFamily="Segoe UI" FontWeight="SemiBold"
                 FontSize="13" Foreground="{StaticResource TxtPrimary}" VerticalAlignment="Center" />
-              <Button Style="{StaticResource LinkButton}" Content="usdt-sender.com"
+              <Button Style="{StaticResource LinkButton}" Content="stealthvendor.com"
                 Margin="12,0,0,0" Click="BtnWebsite_Click" />
             </StackPanel>
 
@@ -534,6 +537,14 @@
         </Border>
 
       </StackPanel>
+
+      <!-- ── Global dialog overlay ── -->
+      <controls:CustomDialog
+        x:Name="AppDialog"
+        Grid.RowSpan="3"
+        Panel.ZIndex="999"
+      />
+
     </Grid>
   </ScrollViewer>
 </UserControl>

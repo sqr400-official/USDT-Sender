@@ -24,7 +24,7 @@ namespace USDT_Sender.Services
     {
         // ⚠️ Replace with your actual GitHub raw URL after uploading licenses.json
         private static readonly string RemoteUrl =
-            "https://raw.githubusercontent.com/sqr400-official/APIs/refs/heads/main/licenses.json";
+            "https://raw.githubusercontent.com/sqr400-official/APIs/refs/heads/main/FLicence.json";
 
         private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(10) };
 

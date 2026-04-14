@@ -229,18 +229,6 @@
                         ToolTip="Open billing terminal"
                         Checked="NavBtn_Checked" Tag="Billing" />
 
-                    <RadioButton x:Name="NavOrders"
-                        Style="{StaticResource NavBtn}"
-                        Content="Orders"
-                        ToolTip="View active orders"
-                        Checked="NavBtn_Checked" Tag="Orders" />
-
-                    <RadioButton x:Name="NavInventory"
-                        Style="{StaticResource NavBtn}"
-                        Content="Inventory"
-                        ToolTip="Manage stock and products"
-                        Checked="NavBtn_Checked" Tag="Inventory" />
-
                     <RadioButton x:Name="NavReports"
                         Style="{StaticResource NavBtn}"
                         Content="Reports"

@@ -40,7 +40,7 @@ namespace USDT_Sender
             // ── FIX: subscribe to Click (not just Checked) on every nav RadioButton.
             // When the user clicks a RadioButton that is ALREADY checked, the Checked
             // event does not fire again — so we use Click to catch that case.
-            foreach (var rb in new[] { NavBilling, NavOrders, NavInventory, NavReports, NavHelp })
+            foreach (var rb in new[] { NavBilling, NavReports, NavHelp })
                 rb.Click += NavBtn_RadioClick;
         }
 
@@ -67,9 +67,7 @@ namespace USDT_Sender
                 // on a non-radio destination (Settings, etc.). This ensures that
                 // when the user later clicks e.g. Billing, IsChecked goes from
                 // false → true and the Checked event fires normally.
-                foreach (
-                    var rb in new[] { NavBilling, NavOrders, NavInventory, NavReports, NavHelp }
-                )
+                foreach (var rb in new[] { NavBilling, NavReports, NavHelp })
                     rb.IsChecked = false;
 
                 NavigateTo(tag);
@@ -87,28 +85,28 @@ namespace USDT_Sender
             );
         }
 
-        private void NavigateTo(string viewTag)
+        internal void NavigateTo(string viewTag)
         {
             if (!_viewCache.TryGetValue(viewTag, out var view))
             {
                 view = viewTag switch
                 {
-                    "Billing"   => new BillingView(),
-                    "Settings"  => new SettingsView(),
-                    "Activation"=> new ActivationView(),
-                    "Help"      => new HelpSupportView(),
-                    "Reports"   => new ReportsView(),
-                    "Orders"    => MakePlaceholder("Orders", "📋", "Order management coming soon."),
-                    "Inventory" => MakePlaceholder(
-                        "Inventory",
-                        "📦",
-                        "Inventory management coming soon."
-                    ),
+                    "Billing" => new BillingView(),
+                    "Settings" => new SettingsView(),
+                    "Activation" => new ActivationView(),
+                    "Help" => new HelpSupportView(),
+                    "Reports" => new ReportsView(),
                     _ => new UserControl(),
                 };
                 _viewCache[viewTag] = view;
             }
 
+            if (view is BillingView billingView)
+            {
+                var (cachedKey, isExpired) = LicenseStorage.Load();
+                bool active = cachedKey != null && !isExpired;
+                billingView.SetAccessLevel(active);
+            }
             // Refresh Reports every time the user navigates to it so newly
             // created transactions from BillingView appear immediately.
             if (view is ReportsView reportsView)

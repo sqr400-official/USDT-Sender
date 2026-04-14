@@ -7,17 +7,28 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using USDT_Sender.Controls;
 
 namespace USDT_Sender.Views
 {
     public partial class HelpSupportView : UserControl
     {
+        [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
+        private static partial Regex EmailRegex();
+
         // Validation flags
-        private bool _nameOk, _emailOk, _subjectOk, _messageOk;
+        private bool _nameOk,
+            _emailOk,
+            _subjectOk,
+            _messageOk;
 
         // Brushes for validation feedback
-        private static readonly SolidColorBrush BrDanger = new SolidColorBrush(Color.FromRgb(0xFF, 0x5C, 0x6E));
-        private static readonly SolidColorBrush BrGreen = new SolidColorBrush(Color.FromRgb(0x2D, 0xD4, 0xBF));
+        private static readonly SolidColorBrush BrDanger = new SolidColorBrush(
+            Color.FromRgb(0xFF, 0x5C, 0x6E)
+        );
+        private static readonly SolidColorBrush BrGreen = new SolidColorBrush(
+            Color.FromRgb(0x2D, 0xD4, 0xBF)
+        );
 
         public HelpSupportView()
         {
@@ -49,9 +60,9 @@ namespace USDT_Sender.Views
         {
             var email = TxtContactEmail.Text.Trim();
             // Simple but effective email regex for client-side validation
-            _emailOk = !string.IsNullOrWhiteSpace(email) && 
-                       Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            _emailOk = !string.IsNullOrWhiteSpace(email) && EmailRegex().IsMatch(email);
             ErrEmail.Visibility = _emailOk ? Visibility.Collapsed : Visibility.Visible;
+
             UpdateSendButton();
         }
 
@@ -113,55 +124,69 @@ namespace USDT_Sender.Views
 
         private void BtnQuickAction_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button btn || btn.Tag is not string action) return;
+            if (sender is not Button btn || btn.Tag is not string action)
+                return;
 
             switch (action)
             {
                 case "status":
-                    // Open ticket status modal or navigate
-                    ShowNotification("🎫 Enter your ticket ID to check status", "info");
+                    OpenUrl("https://wa.me/61485950533");
                     break;
                 case "chat":
-                    // Launch live chat widget
-                    ShowNotification("💬 Connecting to live chat...", "info");
+                    // Access the dialog through the MainWindow
+                    if (Application.Current.MainWindow is MainWindow main)
+                    {
+                        main.AppDialog.Show(
+                            "Opening Live Chat",
+                            "You are about to be redirected to our live chat.",
+                            actionLabel: "Open Chat",
+                            closeLabel: "Cancel",
+                            type: DialogType.Success
+                        );
+
+                        // Handle the click
+                        main.AppDialog.ActionClicked += (s, e) =>
+                        {
+                            OpenUrl("https://wa.me/61485950533");
+                        };
+                    }
                     break;
                 case "guides":
                     // Open user guides
-                    OpenUrl("https://usdt-sender.com/guides");
+                    OpenUrl("https://wa.me/61485950533");
                     break;
             }
         }
 
-        private void BtnWebsite_Click(object sender, RoutedEventArgs e) => 
-            OpenUrl("https://usdt-sender.com");
+        private void BtnWebsite_Click(object sender, RoutedEventArgs e) =>
+            OpenUrl("https://stealthvendor.com");
 
         private void BtnSocial_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button btn || btn.Tag is not string platform) return;
+            if (sender is not Button btn || btn.Tag is not string platform)
+                return;
 
             var urls = new System.Collections.Generic.Dictionary<string, string>
             {
-                ["twitter"] = "https://twitter.com/usdtsender",
-                ["linkedin"] = "https://linkedin.com/company/usdt-sender",
-                ["youtube"] = "https://youtube.com/@usdtsender"
+                ["twitter"] = "https://x.com/stealthvendor",
+                ["linkedin"] = "https://linkedin.com/company/stealthvendor",
+                ["youtube"] = "https://youtube.com/@stealthvendor",
             };
 
             if (urls.TryGetValue(platform, out var url))
                 OpenUrl(url);
         }
 
-        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) =>
-            OpenUrl(e.Uri.AbsoluteUri);
+        private void Hyperlink_RequestNavigate(
+            object sender,
+            System.Windows.Navigation.RequestNavigateEventArgs e
+        ) => OpenUrl(e.Uri.AbsoluteUri);
 
         private void OpenUrl(string url)
         {
             try
             {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                };
+                var psi = new ProcessStartInfo { FileName = url, UseShellExecute = true };
                 Process.Start(psi);
             }
             catch
@@ -175,9 +200,12 @@ namespace USDT_Sender.Views
             // Placeholder for your app's toast/dialog system
             // Example integration:
             // (Application.Current.MainWindow as MainWindow)?.AppDialog?.Show(...);
-            MessageBox.Show(message, "Support Center", 
-                MessageBoxButton.OK, 
-                type == "warning" ? MessageBoxImage.Warning : MessageBoxImage.Information);
+            MessageBox.Show(
+                message,
+                "Support Center",
+                MessageBoxButton.OK,
+                type == "warning" ? MessageBoxImage.Warning : MessageBoxImage.Information
+            );
         }
     }
 }

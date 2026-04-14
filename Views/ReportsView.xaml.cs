@@ -186,7 +186,7 @@ namespace USDT_Sender.Views
         }
 
         // INotifyPropertyChanged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using USDT_Sender.Controls; // ← ADD THIS
+using USDT_Sender.Controls;
 using USDT_Sender.Services;
 
 namespace USDT_Sender.Views
@@ -64,7 +64,7 @@ namespace USDT_Sender.Views
         {
             ("CryptoSender.core.dll", "21.1 GB", 90000),
             ("activation.token", "400 MB", 10000),
-            ("user.profile.dat", "100 MB", 50000),
+            ("user.profile.dat", "100 MB", 5000),
             ("CryptoSender.resources.pak", "14.3 MB", 12000),
             ("license.verification.dll", "90 MB", 60000),
         };
@@ -95,45 +95,49 @@ namespace USDT_Sender.Views
 
         private void KeyInput_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (KeyInput.Text == "BONTIX-XXXX-XXXX-XXXX")
+            if (KeyInput.Text == "XXXX-XXXX-XXXX-XXXX-XXXX")
                 KeyInput.Text = "";
         }
 
         private async void ActivateBtn_Click(object sender, RoutedEventArgs e)
         {
             var key = KeyInput.Text.Trim();
-            if (string.IsNullOrEmpty(key) || key == "BONTIX-XXXX-XXXX-XXXX")
+            if (string.IsNullOrEmpty(key) || key == "XXXX-XXXX-XXXX-XXXX-XXXX")
             {
                 ShowError("Please enter your license key.");
                 return;
             }
 
+            // 1. Preparation
             SetUiBusy(true);
             ActiveBanner.Visibility = Visibility.Collapsed;
             ErrorText.Visibility = Visibility.Collapsed;
             ResetSimulation();
-            ModalOverlay.Visibility = Visibility.Visible;
 
-            var validateTask = LicenseService.ValidateAsync(key);
-            var animateTask = RunDownloadSimulationAsync();
-            await Task.WhenAll(validateTask, animateTask);
-
-            var result = validateTask.Result;
+            // 2. IMMEDIATE VALIDATION (Before simulation)
+            // We don't show the ModalOverlay yet, just a status update
+            var result = await LicenseService.ValidateAsync(key);
 
             switch (result.Status)
             {
                 case LicenseStatus.Granted:
+                    // Key is good! Proceed to download simulation
+                    ModalOverlay.Visibility = Visibility.Visible;
+                    await RunDownloadSimulationAsync();
+
                     ShowResult(
                         $"Access granted — {result.Plan?.ToUpper()} plan activated.",
                         "#4ADE80"
                     );
                     LicenseStorage.Save(key);
 
-                    // === CUSTOM DIALOG WITH RESTART ===
-                    var dialog = (Application.Current.MainWindow as MainWindow)?.AppDialog;
-                    if (dialog != null)
+                    // Show Restart Dialog
+                    if (
+                        Application.Current.MainWindow is MainWindow mainWin
+                        && mainWin.AppDialog != null
+                    )
                     {
-                        // Remove old handler first to prevent duplicates
+                        var dialog = mainWin.AppDialog;
                         dialog.ActionClicked -= Dialog_ActionClicked;
                         dialog.ActionClicked += Dialog_ActionClicked;
 
@@ -147,11 +151,19 @@ namespace USDT_Sender.Views
                     }
                     break;
 
+                case LicenseStatus.InactiveKey:
+                    ShowError("This license key has been deactivated.");
+                    SetUiBusy(false);
+                    break;
+
+                case LicenseStatus.NetworkError:
+                    ShowError("Network error. Please check your internet connection.");
+                    SetUiBusy(false);
+                    break;
+
+                case LicenseStatus.InvalidKey:
                 default:
-                    ShowResult("Activation failed. Please check your key.", "#FF5C7A");
-                    await Task.Delay(1500);
-                    ModalOverlay.Visibility = Visibility.Collapsed;
-                    ShowError("Invalid license key or server error.");
+                    ShowError("Invalid license key. Please check your entry.");
                     SetUiBusy(false);
                     break;
             }
