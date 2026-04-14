@@ -575,12 +575,6 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
-              <TextBlock Text="Recent Transactions" FontFamily="Segoe UI"
-                FontWeight="SemiBold" FontSize="15" Foreground="{StaticResource TxtPrimary}"
-                VerticalAlignment="Center" />
-              <TextBlock x:Name="TxtRecordCount" Text="0 records"
-                FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TxtMuted}"
-                Grid.Column="1" VerticalAlignment="Center" />
             </Grid>
 
             <!-- DataGrid -->

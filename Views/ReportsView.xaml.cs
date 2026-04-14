@@ -209,99 +209,28 @@ namespace USDT_Sender.Views
                 // Use real data — map TransactionRecord → Transaction (same base class)
                 foreach (var record in stored)
                 {
-                    _transactions.Add(new Transaction
-                    {
-                        Date          = record.Date,
-                        Type          = record.Type,
-                        Amount        = record.Amount,
-                        Crypto        = record.Crypto,
-                        Status        = record.Status,
-                        Txid          = record.Txid,
-                        WalletAddress = record.WalletAddress
-                    });
+                    _transactions.Add(
+                        new Transaction
+                        {
+                            Date = record.Date,
+                            Type = record.Type,
+                            Amount = record.Amount,
+                            Crypto = record.Crypto,
+                            Status = record.Status,
+                            Txid = record.Txid,
+                            WalletAddress = record.WalletAddress,
+                        }
+                    );
                 }
             }
-            else
-            {
-                // Fall back to sample data when no real transactions exist yet
-                LoadSampleData();
-                return; // LoadSampleData already updates ItemsSources
-            }
+            // If no transactions exist, list stays empty (empty state panel shown by ApplyFilters).
 
             // Generate chart data based on loaded transactions
             GenerateVolumeData();
 
             // Update UI
             DgTransactions.ItemsSource = _transactions;
-            IcVolumeChart.ItemsSource  = _volumeData;
-        }
-
-        // ═══════════════════════════════════════════════════════════
-        //  SAMPLE DATA - Shown only when no real transactions exist
-        // ═══════════════════════════════════════════════════════════
-
-        private void LoadSampleData()
-        {
-            var random = new Random();
-            string[] cryptos = { "USDT (TRC-20)", "USDT (ERC-20)", "BTC", "ETH", "SOL" };
-            string[] statuses = { "Completed", "Completed", "Completed", "Pending", "Failed" };
-            string[] types = { "Send", "Send", "Send", "Send", "Receive" };
-
-            _transactions.Clear();
-
-            // Create 47 sample transactions
-            for (int i = 0; i < 10; i++)
-            {
-                var tx = new Transaction
-                {
-                    Date = DateTime.Now.AddDays(-random.Next(0, 30)).AddHours(-random.Next(0, 24)),
-                    Type = types[random.Next(types.Length)],
-                    Amount = Math.Round((decimal)(random.NextDouble() * 500 + 10), 2),
-                    Crypto = cryptos[random.Next(cryptos.Length)],
-                    Status = statuses[random.Next(statuses.Length)],
-                    Txid = GenerateMockTxid(),
-                    WalletAddress = GenerateMockWallet(),
-                };
-
-                _transactions.Add(tx);
-            }
-
-            // Sort by date (newest first)
-            var sorted = _transactions.OrderByDescending(t => t.Date).ToList();
-            _transactions.Clear();
-            foreach (var tx in sorted)
-                _transactions.Add(tx);
-
-            // Generate chart data
-            GenerateVolumeData();
-
-            // Update UI
-            DgTransactions.ItemsSource = _transactions;
             IcVolumeChart.ItemsSource = _volumeData;
-        }
-
-        private string GenerateMockTxid()
-        {
-            var random = new Random();
-            char[] chars = "0123456789abcdef".ToCharArray();
-            char[] result = new char[64];
-
-            for (int i = 0; i < 64; i++)
-                result[i] = chars[random.Next(chars.Length)];
-
-            return new string(result);
-        }
-
-        private string GenerateMockWallet()
-        {
-            var random = new Random();
-            char[] chars = "0123456789abcdef".ToCharArray();
-            char[] result = new char[40];
-
-            for (int i = 0; i < 40; i++)
-                result[i] = chars[random.Next(chars.Length)];
-
-            return "0x" + new string(result);
         }
 
         private void GenerateVolumeData()
@@ -364,10 +293,6 @@ namespace USDT_Sender.Views
 
             // Update DataGrid
             DgTransactions.ItemsSource = filteredList;
-
-            // Update record count
-            TxtRecordCount.Text =
-                $"{filteredList.Count} record{(filteredList.Count != 1 ? "s" : "")}";
 
             // Show/hide empty state
             PnlEmptyState.Visibility =
