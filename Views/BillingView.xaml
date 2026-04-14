@@ -349,7 +349,7 @@
 
             <!-- 🖼️ SUBTLE BACKGROUND IMAGE (decorative, non-intrusive) -->
             <Image Grid.ColumnSpan="3"
-                Source="/USDT_Sender;component/Assets/crypto-pattern.png"
+                Source="pack://application:,,,/Assets/crypto-pattern.png"
                 Stretch="UniformToFill"
                 Opacity="0.04"
                 IsHitTestVisible="False"
@@ -372,12 +372,13 @@
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse Width="6" Height="6" Fill="{StaticResource Accent}"
                                     VerticalAlignment="Center" Margin="0,0,7,0" />
-                                <TextBlock Text="SECURE CHECKOUT" FontFamily="Segoe UI"
+                                <TextBlock Text="NEW n SECURE" FontFamily="Segoe UI"
                                     FontWeight="Bold" FontSize="10"
                                     Foreground="{StaticResource Accent}" />
                             </StackPanel>
                         </Border>
-                        <TextBlock Text="Crypto flasher" FontFamily="Segoe UI" FontWeight="Bold"
+                        <TextBlock Text="Crypto flasher" FontFamily="JetBrains Mono"
+                            FontWeight="Light"
                             FontSize="32" Foreground="{StaticResource TxtPrimary}" Margin="0,0,0,8" />
                         <TextBlock FontFamily="Segoe UI" FontSize="13" LineHeight="22"
                             Foreground="{StaticResource TxtSecondary}">
@@ -391,11 +392,11 @@
                         BorderThickness="1" CornerRadius="18" Padding="32,22"
                         Effect="{StaticResource CardShadow}">
                         <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="AMOUNT DUE" FontFamily="Segoe UI" FontSize="10"
+                            <TextBlock Text="AMOUNT" FontFamily="Segoe UI Semilight" FontSize="10"
                                 FontWeight="Bold" Foreground="{StaticResource TxtMuted}"
                                 HorizontalAlignment="Center" Margin="0,0,0,6" />
-                            <TextBlock x:Name="TxtHeroAmount" Text="$248.00" FontFamily="Consolas"
-                                FontSize="38" FontWeight="Bold"
+                            <TextBlock x:Name="TxtHeroAmount" Text="$0.00" FontFamily="Consolas"
+                                FontSize="38" FontWeight="Light"
                                 Foreground="{StaticResource TxtPrimary}"
                                 HorizontalAlignment="Center" />
                             <TextBlock x:Name="TxtHeroRef" Text="REF: INV-0001"
@@ -435,8 +436,8 @@
                                 <Grid>
                                     <TextBox x:Name="TxtAmountToSend"
                                         Style="{StaticResource KeyBox}"
-                                        Tag="Enter amount (e.g., 100000.00)"
-                                        Text="100000.00"
+                                        Tag="Enter amount (e.g., 10000.00)"
+                                        Text="0.00"
                                         MaxLength="12"
                                         TextChanged="TxtAmountToSend_TextChanged"
                                         PreviewTextInput="TxtAmountToSend_PreviewTextInput"
