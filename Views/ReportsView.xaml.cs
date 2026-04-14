@@ -11,58 +11,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using USDT_Sender.Models;
+using USDT_Sender.Services;
 
 namespace USDT_Sender.Views
 {
     // ═══════════════════════════════════════════════════════════
-    //  TRANSACTION MODEL - Represents a single transaction
+    //  TRANSACTION MODEL
+    //  Alias kept for XAML bindings; canonical type is TransactionRecord in Models
     // ═══════════════════════════════════════════════════════════
-    public class Transaction : INotifyPropertyChanged
-    {
-        private string _status;
-        private bool _canRetry;
-
-        public DateTime Date { get; set; }
-        public string Type { get; set; } = "Send";
-        public decimal Amount { get; set; }
-        public string Crypto { get; set; } = "USDT";
-
-        public string Status
-        {
-            get => _status;
-            set
-            {
-                _status = value;
-                OnPropertyChanged();
-                UpdateCanRetry();
-            }
-        }
-
-        public string Txid { get; set; }
-        public string WalletAddress { get; set; }
-
-        public bool CanRetry
-        {
-            get => _canRetry;
-            private set
-            {
-                _canRetry = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private void UpdateCanRetry()
-        {
-            CanRetry = string.Equals(Status, "Failed", StringComparison.OrdinalIgnoreCase);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-    }
+    public class Transaction : TransactionRecord { }
 
     // ═══════════════════════════════════════════════════════════
     //  VOLUME DATA POINT - For the chart
@@ -189,8 +147,16 @@ namespace USDT_Sender.Views
             _transactions = new ObservableCollection<Transaction>();
             _volumeData = new ObservableCollection<VolumeDataPoint>();
 
-            // Load data
-            LoadSampleData();
+            // Load data from local storage (or sample data if empty)
+            LoadRealData();
+            UpdateSummary();
+            ApplyFilters();
+        }
+
+        // ── Public refresh method (called when user navigates to this view) ──
+        public void Refresh()
+        {
+            LoadRealData();
             UpdateSummary();
             ApplyFilters();
         }
@@ -228,7 +194,50 @@ namespace USDT_Sender.Views
         }
 
         // ═══════════════════════════════════════════════════════════
-        //  SAMPLE DATA - Replace with real API calls
+        //  DATA LOADING - Real data from local storage
+        // ═══════════════════════════════════════════════════════════
+
+        private void LoadRealData()
+        {
+            _transactions.Clear();
+
+            // Load persisted transactions from disk
+            var stored = TransactionStorageService.LoadAll();
+
+            if (stored.Count > 0)
+            {
+                // Use real data — map TransactionRecord → Transaction (same base class)
+                foreach (var record in stored)
+                {
+                    _transactions.Add(new Transaction
+                    {
+                        Date          = record.Date,
+                        Type          = record.Type,
+                        Amount        = record.Amount,
+                        Crypto        = record.Crypto,
+                        Status        = record.Status,
+                        Txid          = record.Txid,
+                        WalletAddress = record.WalletAddress
+                    });
+                }
+            }
+            else
+            {
+                // Fall back to sample data when no real transactions exist yet
+                LoadSampleData();
+                return; // LoadSampleData already updates ItemsSources
+            }
+
+            // Generate chart data based on loaded transactions
+            GenerateVolumeData();
+
+            // Update UI
+            DgTransactions.ItemsSource = _transactions;
+            IcVolumeChart.ItemsSource  = _volumeData;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        //  SAMPLE DATA - Shown only when no real transactions exist
         // ═══════════════════════════════════════════════════════════
 
         private void LoadSampleData()

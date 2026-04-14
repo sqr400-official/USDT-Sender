@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -8,6 +8,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using USDT_Sender.Controls;
+using USDT_Sender.Models;
+using USDT_Sender.Services;
 
 namespace USDT_Sender.Views
 {
@@ -275,10 +277,38 @@ namespace USDT_Sender.Views
             await Task.Delay(4000);
             loader?.Hide();
 
+            // ── Build Transaction ID ──────────────────────────────────────
+            var txId = $"TXN-{Guid.NewGuid().ToString()[..8].ToUpper()}";
+
+            // ── Resolve selected crypto label ──────────────────────────────
+            string cryptoLabel = "USDT (TRC-20)";
+            if (CmbCrypto.SelectedItem is ComboBoxItem selectedItem)
+            {
+                // Strip leading icon character (e.g., "◈  USDT (TRC-20)" → "USDT (TRC-20)")
+                var raw = selectedItem.Content?.ToString() ?? "";
+                var parts = raw.Split(new[] { "  " }, 2, StringSplitOptions.None);
+                cryptoLabel = parts.Length > 1 ? parts[1].Trim() : raw.Trim();
+            }
+
+            // ── Persist to local storage ───────────────────────────────────
+            var newTransaction = new TransactionRecord
+            {
+                Date          = DateTime.Now,
+                Type          = "Send",
+                Amount        = _amountDue,
+                Crypto        = cryptoLabel,
+                Status        = "Completed",
+                Txid          = txId,
+                WalletAddress = TxtWalletAddress.Text.Trim()
+            };
+
+            TransactionStorageService.AddTransaction(newTransaction);
+
+            // ── Show success dialog ────────────────────────────────────────
             dialog?.Show(
                 "Payment Confirmed",
                 $"Payment of ${_amountDue:N2} confirmed.\n\n"
-                    + $"Transaction ID: TXN-{Guid.NewGuid().ToString()[..8].ToUpper()}",
+                    + $"Transaction ID: {txId}",
                 actionLabel: "View Receipt",
                 closeLabel: "Done",
                 type: DialogType.Success

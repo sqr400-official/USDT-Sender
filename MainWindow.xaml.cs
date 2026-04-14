@@ -93,22 +93,26 @@ namespace USDT_Sender
             {
                 view = viewTag switch
                 {
-                    "Billing" => new BillingView(),
-                    "Settings" => new SettingsView(),
-                    "Activation" => new ActivationView(),
-                    "Help" => new HelpSupportView(),
-                    "Reports" => new ReportsView(),
-                    "Orders" => MakePlaceholder("Orders", "📋", "Order management coming soon."),
+                    "Billing"   => new BillingView(),
+                    "Settings"  => new SettingsView(),
+                    "Activation"=> new ActivationView(),
+                    "Help"      => new HelpSupportView(),
+                    "Reports"   => new ReportsView(),
+                    "Orders"    => MakePlaceholder("Orders", "📋", "Order management coming soon."),
                     "Inventory" => MakePlaceholder(
                         "Inventory",
                         "📦",
                         "Inventory management coming soon."
                     ),
-
                     _ => new UserControl(),
                 };
                 _viewCache[viewTag] = view;
             }
+
+            // Refresh Reports every time the user navigates to it so newly
+            // created transactions from BillingView appear immediately.
+            if (view is ReportsView reportsView)
+                reportsView.Refresh();
 
             MainContent.Content = view;
         }
